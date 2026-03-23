@@ -18,12 +18,21 @@
             <div class="nav-links">
                 <a href="/">Browse Jobs</a>
                 {% if current_user.is_authenticated %}
+<<<<<<< HEAD
                 <a href="/interviews">Mock Interviews</a>
                 <a href="/dashboard">Dashboard</a>
                 {% if current_user.role == 'employer' %}
                 <a href="/submit" class="btn btn-primary">Post a Job</a>
                 {% endif %}
                 <a href="/logout">Logout ({{ current_user.username }})</a>
+=======
+                    <a href="/interviews">Mock Interviews</a>
+                    <a href="/dashboard">Dashboard</a>
+                    {% if current_user.role == 'employer' %}
+                        <a href="/submit" class="btn btn-primary">Post a Job</a>
+                    {% endif %}
+                    <a href="/logout">Logout ({{ current_user.username }})</a>
+>>>>>>> refs/remotes/origin/master
                 {% else %}
                 <a href="/login">Login</a>
                 <a href="/register" class="btn btn-outline">Register</a>
@@ -52,5 +61,8 @@
         </div>
     </footer>
 </body>
+<<<<<<< HEAD
 
+=======
+>>>>>>> refs/remotes/origin/master
 </html>
