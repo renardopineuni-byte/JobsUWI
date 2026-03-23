@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="hero">
+    <h1 style="font-size: 3rem; margin-top: 4rem; text-align: center;">Find Your Next <span style="color: var(--primary);">Dream Job</span></h1>
+    <p style="text-align: center; color: var(--text-muted); max-width: 600px; margin: 1rem auto;">Explore premium opportunities from top companies worldwide.</p>
+</div>
+
+<div class="job-grid">
+    {% for job in jobs %}
+    <div class="job-card">
+        <h3>{{ job.title }}</h3>
+        <span class="company">{{ job.company }}</span>
+        <p>{{ job.description[:150] }}{% if job.description|length > 150 %}...{% endif %}</p>
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+            <small style="color: var(--text-muted);">Posted {{ job.created_at.strftime('%Y-%m-%d') }}</small>
+            <a href="#" class="btn btn-outline" style="font-size: 0.8rem;">Details</a>
+        </div>
+    </div>
+    {% else %}
+    <p style="grid-column: 1/-1; text-align: center; margin-top: 4rem; color: var(--text-muted);">No job listings available at the moment. Check back later!</p>
+    {% endfor %}
+</div>
+{% endblock %}

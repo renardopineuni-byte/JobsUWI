@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="form-container" style="max-width: 800px;">
+    <h2>Post a <span style="color: var(--primary);">Job Listing</span></h2>
+    <form method="POST">
+        <div class="form-group">
+            <label>Job Title</label>
+            <input type="text" name="title" required placeholder="e.g. Senior Software Engineer">
+        </div>
+        <div class="form-group">
+            <label>Company Name</label>
+            <input type="text" name="company" required placeholder="e.g. Acme Corp">
+        </div>
+        <div class="form-group">
+            <label>Job Description</label>
+            <textarea name="description" rows="8" required placeholder="Describe the role, responsibilities, and requirements..."></textarea>
+        </div>
+        <button type="submit" class="btn btn-primary">Submit for Approval</button>
+        <a href="/dashboard" class="btn btn-outline" style="margin-left: 1rem;">Cancel</a>
+    </form>
+</div>
+{% endblock %}

@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="form-container">
+    <h2>Join the <span style="color: var(--primary);">Network</span></h2>
+    <form method="POST">
+        <div class="form-group">
+            <label>Username</label>
+            <input type="text" name="username" required>
+        </div>
+        <div class="form-group">
+            <label>Password</label>
+            <input type="password" name="password" required>
+        </div>
+        <div class="form-group">
+            <label>Your Role</label>
+            <select name="role" required>
+                <option value="employer">Employer (I want to post jobs)</option>
+                <option value="student">Student (I'm looking for jobs)</option>
+                <option value="employee">Organization Moderator (Employee)</option>
+            </select>
+        </div>
+        <button type="submit" class="btn btn-primary" style="width: 100%;">Create Account</button>
+    </form>
+    <p style="margin-top: 1.5rem; text-align: center; color: var(--text-muted);">
+        Already have an account? <a href="/login" style="color: var(--primary);">Login here</a>
+    </p>
+</div>
+{% endblock %}
