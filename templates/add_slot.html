@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="form-container">
+    <h2 style="margin-bottom: 0.5rem;">Add Interview <span style="color: var(--primary);">Slot</span></h2>
+    <p style="color: var(--text-muted); margin-bottom: 2rem;">Add a time slot for students to book a mock interview.</p>
+
+    <form method="POST">
+        <div class="form-group">
+            <label>Date & Time</label>
+            <input type="datetime-local" name="start_time" required>
+        </div>
+        <div class="form-group">
+            <label>Duration</label>
+            <select name="duration">
+                <option value="15">15 minutes</option>
+                <option value="30" selected>30 minutes</option>
+                <option value="45">45 minutes</option>
+                <option value="60">60 minutes</option>
+            </select>
+        </div>
+        <div style="display: flex; gap: 1rem; margin-top: 2rem;">
+            <button type="submit" class="btn btn-primary" style="flex: 1;">Add slot</button>
+            <a href="/interviews" class="btn btn-outline" style="flex: 1; text-align: center;">Cancel</a>
+        </div>
+    </form>
+</div>
+{% endblock %}

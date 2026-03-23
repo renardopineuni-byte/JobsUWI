@@ -1,14 +1,16 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>JobHub - Connecting Talent & Opportunity</title>
+    <title>UWIJobs - Connecting Talent & Opportunity</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/index.css') }}">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 </head>
+
 <body>
     <nav class="navbar">
         <div class="container">
@@ -16,14 +18,15 @@
             <div class="nav-links">
                 <a href="/">Browse Jobs</a>
                 {% if current_user.is_authenticated %}
-                    <a href="/dashboard">Dashboard</a>
-                    {% if current_user.role == 'employer' %}
-                        <a href="/submit" class="btn btn-primary">Post a Job</a>
-                    {% endif %}
-                    <a href="/logout">Logout ({{ current_user.username }})</a>
+                <a href="/interviews">Mock Interviews</a>
+                <a href="/dashboard">Dashboard</a>
+                {% if current_user.role == 'employer' %}
+                <a href="/submit" class="btn btn-primary">Post a Job</a>
+                {% endif %}
+                <a href="/logout">Logout ({{ current_user.username }})</a>
                 {% else %}
-                    <a href="/login">Login</a>
-                    <a href="/register" class="btn btn-outline">Register</a>
+                <a href="/login">Login</a>
+                <a href="/register" class="btn btn-outline">Register</a>
                 {% endif %}
             </div>
         </div>
@@ -31,13 +34,13 @@
 
     <main class="container">
         {% with messages = get_flashed_messages() %}
-          {% if messages %}
-            <div class="flash-messages">
-              {% for message in messages %}
-                <div class="flash-item">{{ message }}</div>
-              {% endfor %}
-            </div>
-          {% endif %}
+        {% if messages %}
+        <div class="flash-messages">
+            {% for message in messages %}
+            <div class="flash-item">{{ message }}</div>
+            {% endfor %}
+        </div>
+        {% endif %}
         {% endwith %}
 
         {% block content %}{% endblock %}
@@ -45,8 +48,9 @@
 
     <footer class="footer">
         <div class="container">
-            <p>&copy; 2026 JobHub Organization. All rights reserved.</p>
+            <p>&copy; 2026 UWI Jobs Organization. All rights reserved.</p>
         </div>
     </footer>
 </body>
+
 </html>

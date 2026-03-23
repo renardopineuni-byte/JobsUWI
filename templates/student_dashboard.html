@@ -1,0 +1,63 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div style="margin-top: 4rem;">
+    <div style="margin-bottom: 3rem;">
+        <h2>Welcome back, <span style="color: var(--primary);">{{ current_user.username }}</span></h2>
+        <p style="color: var(--text-muted); margin-top: 0.5rem;">Your student hub for careers and interviews.</p>
+    </div>
+
+    <div style="display: grid; grid-template-columns: 1fr; gap: 3rem;">
+        
+        <!-- Interview Section -->
+        <div>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+                <h3 style="font-size: 1.2rem; margin: 0;">📅 Your Scheduled <span style="color: var(--primary);">Interviews</span></h3>
+                <a href="/interviews" style="font-size: 0.9rem; color: var(--primary);">View all &rarr;</a>
+            </div>
+            
+            <div class="job-grid" style="margin-top: 0;">
+                {% for b in bookings %}
+                <div class="job-card">
+                    <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                        <h3>{{ b.date_time.strftime('%d %b %Y, %H:%M') }}</h3>
+                        <span class="status-badge status-approved">scheduled</span>
+                    </div>
+                    <span class="company">With: {{ b.interviewer_name }}</span>
+                    <p style="margin-top: 1rem; font-size: 0.85rem; color: var(--text-muted);">
+                        Confirmation: <strong style="color: var(--text-main);">{{ b.confirmation_code }}</strong>
+                    </p>
+                </div>
+                {% else %}
+                <div style="background: rgba(255,255,255,0.03); border: 1px dashed rgba(255,255,255,0.1); border-radius: 12px; padding: 2.5rem; text-align: center; grid-column: 1/-1;">
+                    <p style="color: var(--text-muted);">No interviews scheduled yet.</p>
+                    <a href="/interviews" class="btn btn-outline" style="margin-top: 1rem; display: inline-block;">Browse available slots</a>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- Jobs Section -->
+        <div>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+                <h3 style="font-size: 1.2rem; margin: 0;">🚀 Recommended <span style="color: var(--primary);">Opportunities</span></h3>
+                <a href="/" style="font-size: 0.9rem; color: var(--primary);">Browse all &rarr;</a>
+            </div>
+            
+            <div class="job-grid" style="margin-top: 0;">
+                {% for job in jobs %}
+                <div class="job-card">
+                    <h3>{{ job.title }}</h3>
+                    <span class="company">{{ job.company }}</span>
+                    <p>{{ job.description[:120] }}...</p>
+                    <a href="/" class="btn btn-outline" style="margin-top: 1rem; font-size: 0.8rem; width: 100%; text-align: center;">View Details</a>
+                </div>
+                {% else %}
+                <p style="grid-column: 1/-1; text-align: center; color: var(--text-muted);">No new jobs posted yet. Check back soon!</p>
+                {% endfor %}
+            </div>
+        </div>
+
+    </div>
+</div>
+{% endblock %}

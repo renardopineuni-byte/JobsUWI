@@ -1,0 +1,71 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div style="margin-top: 4rem;">
+    <div style="display: flex; justify-content: space-between; align-items: center;">
+        <div>
+            <h2>Mock <span style="color: var(--primary);">Interviews</span></h2>
+            <p style="color: var(--text-muted); margin-top: 0.5rem;">Schedule a mock interview with an available staff member.</p>
+        </div>
+        {% if current_user.role in ('employer', 'employee') %}
+        <a href="/interviews/add_slot" class="btn btn-primary">+ Add slot</a>
+        {% endif %}
+    </div>
+
+    <!-- Student's upcoming bookings -->
+    {% if my_bookings %}
+    <h3 style="margin: 2.5rem 0 1rem; font-size: 1.1rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em;">Your upcoming interviews</h3>
+    <div class="job-grid" style="margin-top: 0;">
+        {% for b in my_bookings %}
+        <div class="job-card">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                <h3>{{ b.date_time.strftime('%d %b %Y, %H:%M') }}</h3>
+                <span class="status-badge status-approved">scheduled</span>
+            </div>
+            <span class="company">{{ b.interviewer_name }}</span>
+            <p>Confirmation code: <strong style="color: var(--text-main);">{{ b.confirmation_code }}</strong></p>
+            <form method="POST" action="/interviews/cancel/{{ b.id }}">
+                <button type="submit" class="btn btn-outline"
+                    style="font-size: 0.85rem; color: #ef4444; border-color: #ef4444; width: 100%;"
+                    onclick="return confirm('Cancel this interview?')">Cancel booking</button>
+            </form>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <!-- Available slots -->
+    <h3 style="margin: 2.5rem 0 1rem; font-size: 1.1rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em;">Available slots</h3>
+
+    {% if available_slots %}
+    <div class="job-grid" style="margin-top: 0;">
+        {% for slot in available_slots %}
+        <div class="job-card">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                <h3>{{ slot.start_time.strftime('%d %b %Y, %H:%M') }}</h3>
+                <span class="status-badge status-approved">available</span>
+            </div>
+            <span class="company">{{ slot.staff.username }}</span>
+            <p>Duration: {{ slot.duration_minutes }} minutes</p>
+            {% if current_user.role == 'student' %}
+            <form method="POST" action="/interviews/book/{{ slot.id }}">
+                <button type="submit" class="btn btn-primary" style="width: 100%;">Book this slot</button>
+            </form>
+            {% else %}
+            <p style="font-size: 0.85rem; color: var(--text-muted); margin: 0;">Log in as a student to book.</p>
+            {% endif %}
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div style="text-align: center; padding: 4rem 0; color: var(--text-muted);">
+        <p style="font-size: 1.1rem;">No time slots available at the moment.</p>
+        {% if current_user.role in ('employer', 'employee') %}
+        <a href="/interviews/add_slot" style="color: var(--primary); margin-top: 0.5rem; display: inline-block;">Add a slot now →</a>
+        {% else %}
+        <p style="margin-top: 0.5rem; font-size: 0.9rem;">Please check back later.</p>
+        {% endif %}
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
