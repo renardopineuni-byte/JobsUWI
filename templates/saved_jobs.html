@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div style="margin-top: 4rem;">
+    <div style="margin-bottom: 3rem; display: flex; justify-content: space-between; align-items: center;">
+        <div>
+            <h2>Your Saved <span style="color: var(--primary);">Jobs</span></h2>
+            <p style="color: var(--text-muted); margin-top: 0.5rem;">Keep track of roles you are interested in.</p>
+        </div>
+        <a href="/dashboard" class="btn btn-outline">Back to Dashboard</a>
+    </div>
+
+    <div class="job-grid">
+        {% for job in jobs %}
+        <div class="job-card">
+            <h3>{{ job.role }}</h3>
+            <span class="company">{{ job.company }}</span>
+            <p>{{ job.description[:120] }}...</p>
+            <span class="status-badge status-approved" style="margin-top: 1rem; margin-bottom: 1rem;">Saved</span>
+        </div>
+        {% else %}
+        <div style="background: rgba(255,255,255,0.03); border: 1px dashed rgba(255,255,255,0.1); border-radius: 12px; padding: 2.5rem; text-align: center; grid-column: 1/-1;">
+            <p style="color: var(--text-muted);">You haven't saved any jobs yet.</p>
+            <a href="/search-jobs" class="btn btn-outline" style="margin-top: 1rem; display: inline-block;">Search for Jobs</a>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

@@ -9,7 +9,7 @@
         {% for job in jobs %}
         <div class="job-card">
             <div style="display: flex; justify-content: space-between; align-items: flex-start;">
-                <h3>{{ job.title }}</h3>
+                <h3>{{ job.role }}</h3>
                 <span class="status-badge status-{{ job.status }}">{{ job.status }}</span>
             </div>
             <span class="company">{{ job.company }}</span>

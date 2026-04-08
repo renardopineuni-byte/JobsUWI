@@ -19,11 +19,11 @@
         {% for b in my_bookings %}
         <div class="job-card">
             <div style="display: flex; justify-content: space-between; align-items: flex-start;">
-                <h3>{{ b.date_time.strftime('%d %b %Y, %H:%M') }}</h3>
+                <h3>{{ b.start.strftime('%d %b %Y, %H:%M') }}</h3>
                 <span class="status-badge status-approved">scheduled</span>
             </div>
-            <span class="company">{{ b.interviewer_name }}</span>
-            <p>Confirmation code: <strong style="color: var(--text-main);">{{ b.confirmation_code }}</strong></p>
+            <span class="company">{{ b.interviewer.username }}</span>
+            <p>Confirmation code: <strong style="color: var(--text-main);">{{ b.confirmationCode }}</strong></p>
             <form method="POST" action="/interviews/cancel/{{ b.id }}">
                 <button type="submit" class="btn btn-outline"
                     style="font-size: 0.85rem; color: #ef4444; border-color: #ef4444; width: 100%;"
@@ -42,11 +42,11 @@
         {% for slot in available_slots %}
         <div class="job-card">
             <div style="display: flex; justify-content: space-between; align-items: flex-start;">
-                <h3>{{ slot.start_time.strftime('%d %b %Y, %H:%M') }}</h3>
+                <h3>{{ slot.start.strftime('%d %b %Y, %H:%M') }}</h3>
                 <span class="status-badge status-approved">available</span>
             </div>
-            <span class="company">{{ slot.staff.username }}</span>
-            <p>Duration: {{ slot.duration_minutes }} minutes</p>
+            <span class="company">{{ slot.interviewer.username }}</span>
+            <p>Duration: {{ slot.duration }} minutes</p>
             {% if current_user.role == 'student' %}
             <form method="POST" action="/interviews/book/{{ slot.id }}">
                 <button type="submit" class="btn btn-primary" style="width: 100%;">Book this slot</button>

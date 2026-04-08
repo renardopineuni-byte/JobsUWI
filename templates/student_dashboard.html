@@ -20,12 +20,12 @@
                 {% for b in bookings %}
                 <div class="job-card">
                     <div style="display: flex; justify-content: space-between; align-items: flex-start;">
-                        <h3>{{ b.date_time.strftime('%d %b %Y, %H:%M') }}</h3>
+                        <h3>{{ b.start.strftime('%d %b %Y, %H:%M') }}</h3>
                         <span class="status-badge status-approved">scheduled</span>
                     </div>
-                    <span class="company">With: {{ b.interviewer_name }}</span>
+                    <span class="company">With: {{ b.interviewer.username }}</span>
                     <p style="margin-top: 1rem; font-size: 0.85rem; color: var(--text-muted);">
-                        Confirmation: <strong style="color: var(--text-main);">{{ b.confirmation_code }}</strong>
+                        Confirmation: <strong style="color: var(--text-main);">{{ b.confirmationCode }}</strong>
                     </p>
                 </div>
                 {% else %}
@@ -47,7 +47,7 @@
             <div class="job-grid" style="margin-top: 0;">
                 {% for job in jobs %}
                 <div class="job-card">
-                    <h3>{{ job.title }}</h3>
+                    <h3>{{ job.role }}</h3>
                     <span class="company">{{ job.company }}</span>
                     <p>{{ job.description[:120] }}...</p>
                     <a href="/" class="btn btn-outline" style="margin-top: 1rem; font-size: 0.8rem; width: 100%; text-align: center;">View Details</a>

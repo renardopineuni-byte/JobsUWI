@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div style="margin-top: 4rem;">
+    <div style="margin-bottom: 3rem; display: flex; justify-content: space-between; align-items: center;">
+        <div>
+            <h2>Search <span style="color: var(--primary);">Jobs</span></h2>
+            <p style="color: var(--text-muted); margin-top: 0.5rem;">Find the perfect opportunity for your career.</p>
+        </div>
+        <a href="/dashboard" class="btn btn-outline">Back to Dashboard</a>
+    </div>
+
+    <!-- Search Form -->
+    <div style="background: var(--bg-card); border-radius: 12px; padding: 2rem; margin-bottom: 3rem; border: 1px solid var(--border-color);">
+        <form method="GET" action="/search-jobs" style="display: flex; gap: 1rem;">
+            <input type="text" name="keyword" value="{{ keyword }}" placeholder="Search by title, company, or description..." class="form-control" style="flex: 1;" required>
+            <button type="submit" class="btn">Search</button>
+            {% if keyword %}
+                <a href="/search-jobs" class="btn btn-outline">Clear</a>
+            {% endif %}
+        </form>
+    </div>
+
+    <div class="job-grid">
+        {% for job in jobs %}
+        <div class="job-card">
+            <h3>{{ job.role }}</h3>
+            <span class="company">{{ job.company }}</span>
+            <p>{{ job.description[:120] }}...</p>
+            <div style="margin-top: 1rem; display: flex; gap: 0.5rem; justify-content: space-between;">
+                <form action="/save-job/{{ job.id }}" method="POST" style="margin:0;">
+                    <button type="submit" class="btn btn-outline" style="font-size: 0.8rem;">Save Job</button>
+                </form>
+            </div>
+        </div>
+        {% else %}
+        <div style="background: rgba(255,255,255,0.03); border: 1px dashed rgba(255,255,255,0.1); border-radius: 12px; padding: 2.5rem; text-align: center; grid-column: 1/-1;">
+            <p style="color: var(--text-muted);">No jobs found matching your search.</p>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}
