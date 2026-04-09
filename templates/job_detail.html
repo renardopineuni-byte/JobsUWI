@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div style="max-width: 800px; margin: 4rem auto;">
+    <a href="/" style="color: var(--primary); text-decoration: none; font-size: 0.9rem;">&larr; Back to listings</a>
+
+    <div style="margin-top: 2rem; background: var(--bg-card); border: 1px solid var(--border); border-radius: 16px; padding: 2.5rem;">
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1.5rem;">
+            <div>
+                <h1 style="font-size: 1.8rem; margin-bottom: 0.5rem;">{{ job.role }}</h1>
+                <span class="company" style="font-size: 1.1rem;">{{ job.company }}</span>
+            </div>
+            <span class="status-badge status-{{ job.status }}">{{ job.status }}</span>
+        </div>
+
+        <div style="border-top: 1px solid var(--border); padding-top: 1.5rem; margin-top: 1rem;">
+            <h3 style="font-size: 1rem; color: var(--text-muted); text-transform: uppercase; margin-bottom: 1rem;">Job Description</h3>
+            <p style="line-height: 1.8; font-size: 1rem;">{{ job.description }}</p>
+        </div>
+
+        <div style="margin-top: 1.5rem; font-size: 0.9rem; color: var(--text-muted);">
+            Posted {{ job.created_at.strftime('%d %B %Y') }}
+        </div>
+
+        {% if current_user.is_authenticated and current_user.role == 'student' %}
+        <div style="margin-top: 2rem; border-top: 1px solid var(--border); padding-top: 1.5rem;">
+            {% if already_applied %}
+            <p style="color: var(--accent); font-weight: 600;">You have already applied to this position.</p>
+            <a href="{{ url_for('presenter_bp.my_applications') }}" class="btn btn-outline" style="margin-top: 0.75rem;">View My Applications</a>
+            {% else %}
+            <a href="{{ url_for('presenter_bp.apply_job', job_id=job.id) }}" class="btn btn-primary" style="font-size: 1rem; padding: 0.8rem 2rem;">Apply Now</a>
+            {% endif %}
+        </div>
+        {% elif not current_user.is_authenticated %}
+        <div style="margin-top: 2rem; border-top: 1px solid var(--border); padding-top: 1.5rem;">
+            <a href="{{ url_for('auth_bp.login') }}" class="btn btn-outline">Login to Apply</a>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

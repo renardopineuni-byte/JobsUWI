@@ -23,17 +23,18 @@ def register():
     if request.method == 'POST':
         username = request.form.get('username')
         password = request.form.get('password')
+        email = request.form.get('email')
         role = request.form.get('role')
         user_exists = User.query.filter_by(username=username).first()
         if user_exists:
             flash('Username already exists.')
         else:
             if role == 'employer':
-                new_user = Employer(username=username, password=password)
+                new_user = Employer(username=username, password=password, email=email)
             elif role == 'student':
-                new_user = Student(username=username, password=password)
+                new_user = Student(username=username, password=password, email=email)
             elif role == 'employee':
-                new_user = Employee(username=username, password=password)
+                new_user = Employee(username=username, password=password, email=email)
             else:
                 new_user = User(username=username, password=password, role=role)
                 

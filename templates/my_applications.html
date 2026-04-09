@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div style="margin-top: 4rem;">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+        <h2>My <span style="color: var(--primary);">Applications</span></h2>
+        <a href="/" class="btn btn-outline" style="font-size: 0.85rem;">Browse Jobs</a>
+    </div>
+
+    <div class="job-grid">
+        {% for app in applications %}
+        <div class="job-card">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                <h3>{{ app.job.role }}</h3>
+                <span class="status-badge status-{{ app.status|lower|replace(' ', '-') }}">{{ app.status }}</span>
+            </div>
+            <span class="company">{{ app.job.company }}</span>
+            <p style="margin-top: 1rem; font-size: 0.85rem; color: var(--text-muted);">
+                Application ID: <strong style="color: var(--text-main);">{{ app.id }}</strong>
+            </p>
+            <p style="font-size: 0.85rem; color: var(--text-muted);">
+                Submitted: {{ app.submitted_at.strftime('%d %b %Y, %H:%M') }}
+            </p>
+            <p style="font-size: 0.85rem; color: var(--text-muted);">
+                Documents: {{ app.documents|length }} file{{ 's' if app.documents|length != 1 }}
+            </p>
+            {% if app.gpa_snapshot %}
+            <p style="font-size: 0.85rem; color: var(--text-muted);">GPA: {{ app.gpa_snapshot }}</p>
+            {% endif %}
+        </div>
+        {% else %}
+        <div style="background: rgba(255,255,255,0.03); border: 1px dashed rgba(255,255,255,0.1); border-radius: 12px; padding: 2.5rem; text-align: center; grid-column: 1/-1;">
+            <p style="color: var(--text-muted);">You haven't submitted any applications yet.</p>
+            <a href="/" class="btn btn-outline" style="margin-top: 1rem; display: inline-block;">Browse available jobs</a>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

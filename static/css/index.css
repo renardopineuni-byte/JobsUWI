@@ -215,6 +215,10 @@ body {
 .status-pending { background: #eab308; color: #000; }
 .status-approved { background: #22c55e; color: #fff; }
 .status-rejected { background: #ef4444; color: #fff; }
+.status-submitted { background: #6366f1; color: #fff; }
+.status-under-review { background: #f59e0b; color: #000; }
+.status-offer-extended { background: #22c55e; color: #fff; }
+.status-referred { background: #38bdf8; color: #000; }
 
 .action-row {
     display: flex;

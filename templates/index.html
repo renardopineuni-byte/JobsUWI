@@ -14,7 +14,7 @@
         <p>{{ job.description[:150] }}{% if job.description|length > 150 %}...{% endif %}</p>
         <div style="display: flex; justify-content: space-between; align-items: center;">
             <small style="color: var(--text-muted);">Posted {{ job.created_at.strftime('%Y-%m-%d') }}</small>
-            <a href="#" class="btn btn-outline" style="font-size: 0.8rem;">Details</a>
+            <a href="{{ url_for('presenter_bp.job_detail', job_id=job.id) }}" class="btn btn-outline" style="font-size: 0.8rem;">View Details</a>
         </div>
     </div>
     {% else %}

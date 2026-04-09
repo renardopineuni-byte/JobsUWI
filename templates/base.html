@@ -20,6 +20,10 @@
                 {% if current_user.is_authenticated %}
                 <a href="/interviews">Mock Interviews</a>
                 <a href="/dashboard">Dashboard</a>
+                {% if current_user.role == 'student' %}
+                <a href="/my-applications">My Applications</a>
+                <a href="/profile">Profile</a>
+                {% endif %}
                 {% if current_user.role == 'employer' %}
                 <a href="/submit" class="btn btn-primary">Post a Job</a>
                 {% endif %}

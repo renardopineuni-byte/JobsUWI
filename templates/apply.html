@@ -1,0 +1,65 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="form-container" style="max-width: 650px;">
+    <h2>Apply for <span style="color: var(--primary);">{{ job.role }}</span></h2>
+    <p style="color: var(--text-muted); margin-bottom: 2rem;">{{ job.company }}</p>
+
+    <div style="background: var(--bg-dark); border: 1px solid var(--border); border-radius: 12px; padding: 1.5rem; margin-bottom: 2rem;">
+        <h4 style="margin-bottom: 0.5rem; font-size: 0.9rem; color: var(--text-muted); text-transform: uppercase;">Job Description</h4>
+        <p style="font-size: 0.95rem; line-height: 1.6;">{{ job.description }}</p>
+    </div>
+
+    <div style="background: var(--bg-dark); border: 1px solid var(--border); border-radius: 12px; padding: 1.5rem; margin-bottom: 2rem;">
+        <h4 style="margin-bottom: 0.5rem; font-size: 0.9rem; color: var(--text-muted); text-transform: uppercase;">Your Profile (attached automatically)</h4>
+        <p style="font-size: 0.95rem;">
+            <strong>GPA:</strong> {{ current_user.gpa if current_user.gpa else 'Not set' }} &nbsp;|&nbsp;
+            <strong>Preferred Hours:</strong> {{ current_user.preferred_hours if current_user.preferred_hours else 'Not set' }}
+        </p>
+        {% if not current_user.gpa and not current_user.preferred_hours %}
+        <a href="{{ url_for('presenter_bp.profile') }}" style="color: var(--primary); font-size: 0.85rem;">Update your profile before applying &rarr;</a>
+        {% endif %}
+    </div>
+
+    <form method="POST" enctype="multipart/form-data">
+        <div class="form-group">
+            <label>Upload CV and Other Supporting Documents (PDF only, max 5MB each, 10MB total)</label>
+            <input type="file" name="documents" accept=".pdf" multiple required
+                   style="width: 100%; padding: 0.8rem; background: var(--bg-dark); border: 1px solid var(--border); border-radius: 8px; color: white;">
+        </div>
+        <div id="file-errors" style="color: #ef4444; font-size: 0.85rem; margin-bottom: 1rem; display: none;"></div>
+        <button type="submit" class="btn btn-primary" style="width: 100%;">Submit Application</button>
+    </form>
+</div>
+
+<script>
+document.querySelector('input[name="documents"]').addEventListener('change', function() {
+    const errors = document.getElementById('file-errors');
+    const maxPerFile = 5 * 1024 * 1024;
+    const maxTotal = 10 * 1024 * 1024;
+    let total = 0;
+    errors.style.display = 'none';
+    errors.textContent = '';
+    for (const file of this.files) {
+        if (!file.name.toLowerCase().endsWith('.pdf')) {
+            errors.textContent = `"${file.name}" is not a PDF file.`;
+            errors.style.display = 'block';
+            this.value = '';
+            return;
+        }
+        if (file.size > maxPerFile) {
+            errors.textContent = `"${file.name}" exceeds the 5MB limit.`;
+            errors.style.display = 'block';
+            this.value = '';
+            return;
+        }
+        total += file.size;
+    }
+    if (total > maxTotal) {
+        errors.textContent = 'Total file size exceeds 10MB.';
+        errors.style.display = 'block';
+        this.value = '';
+    }
+});
+</script>
+{% endblock %}

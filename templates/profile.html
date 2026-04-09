@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="form-container">
+    <h2>Student <span style="color: var(--primary);">Profile</span></h2>
+    <p style="color: var(--text-muted); margin-bottom: 2rem;">This information is automatically attached to your job applications.</p>
+    <form method="POST">
+        <div class="form-group">
+            <label>GPA (0 - 4.3)</label>
+            <input type="number" name="gpa" step="0.01" min="0" max="4.3"
+                   value="{{ current_user.gpa if current_user.gpa else '' }}"
+                   placeholder="e.g. 3.50">
+        </div>
+        <div class="form-group">
+            <label>Preferred Working Hours</label>
+            <select name="preferred_hours">
+                <option value="">Select...</option>
+                <option value="Full-time" {{ 'selected' if current_user.preferred_hours == 'Full-time' }}>Full-time</option>
+                <option value="Part-time" {{ 'selected' if current_user.preferred_hours == 'Part-time' }}>Part-time</option>
+                <option value="Flexible" {{ 'selected' if current_user.preferred_hours == 'Flexible' }}>Flexible</option>
+                <option value="Mornings only" {{ 'selected' if current_user.preferred_hours == 'Mornings only' }}>Mornings only</option>
+                <option value="Evenings only" {{ 'selected' if current_user.preferred_hours == 'Evenings only' }}>Evenings only</option>
+            </select>
+        </div>
+        <button type="submit" class="btn btn-primary" style="width: 100%;">Save Profile</button>
+    </form>
+</div>
+{% endblock %}

@@ -40,6 +40,34 @@
         <!-- Jobs Section -->
         <div>
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+                <h3 style="font-size: 1.2rem; margin: 0;">📋 Recent <span style="color: var(--primary);">Applications</span></h3>
+                <a href="/my-applications" style="font-size: 0.9rem; color: var(--primary);">View all &rarr;</a>
+            </div>
+
+            <div class="job-grid" style="margin-top: 0;">
+                {% if current_user.applications %}
+                {% for app in current_user.applications[:3] %}
+                <div class="job-card">
+                    <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                        <h3>{{ app.job.role }}</h3>
+                        <span class="status-badge status-{{ app.status|lower|replace(' ', '-') }}">{{ app.status }}</span>
+                    </div>
+                    <span class="company">{{ app.job.company }}</span>
+                    <p style="margin-top: 1rem; font-size: 0.85rem; color: var(--text-muted);">ID: {{ app.id }} — {{ app.submitted_at.strftime('%d %b %Y') }}</p>
+                </div>
+                {% endfor %}
+                {% else %}
+                <div style="background: rgba(255,255,255,0.03); border: 1px dashed rgba(255,255,255,0.1); border-radius: 12px; padding: 2.5rem; text-align: center; grid-column: 1/-1;">
+                    <p style="color: var(--text-muted);">No applications submitted yet.</p>
+                    <a href="/" class="btn btn-outline" style="margin-top: 1rem; display: inline-block;">Browse jobs &amp; apply</a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Recommended Jobs Section -->
+        <div>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
                 <h3 style="font-size: 1.2rem; margin: 0;">🚀 Recommended <span style="color: var(--primary);">Opportunities</span></h3>
                 <a href="/" style="font-size: 0.9rem; color: var(--primary);">Browse all &rarr;</a>
             </div>

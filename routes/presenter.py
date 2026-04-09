@@ -2,6 +2,9 @@ from flask import Blueprint, render_template, request, redirect, url_for, flash
 from flask_login import login_required, current_user
 from services.job_manager import JobManager
 from services.interview_scheduler import InterviewScheduler
+from services.application_service import ApplicationService
+from services.email_service import send_application_confirmation
+from extensions import db
 from datetime import datetime
 
 presenter_bp = Blueprint('presenter_bp', __name__)
@@ -10,6 +13,15 @@ presenter_bp = Blueprint('presenter_bp', __name__)
 def loadJobListings():
     jobs = JobManager.getApprovedJobs()
     return render_template('index.html', jobs=jobs)
+
+@presenter_bp.route('/job/<int:job_id>')
+def job_detail(job_id):
+    from models.job import JobListing
+    job = JobListing.query.get_or_404(job_id)
+    already_applied = False
+    if current_user.is_authenticated and current_user.role == 'student':
+        already_applied = ApplicationService.hasApplied(current_user.id, job_id)
+    return render_template('job_detail.html', job=job, already_applied=already_applied)
 
 @presenter_bp.route('/dashboard')
 @login_required
@@ -154,3 +166,77 @@ def cancel_interview(slot_id):
     else:
         flash('Interview booking cancelled.')
     return redirect(url_for('presenter_bp.loadInterviewBoard'))
+
+# Application Routes
+@presenter_bp.route('/apply/<int:job_id>', methods=['GET', 'POST'])
+@login_required
+def apply_job(job_id):
+    if current_user.role != 'student':
+        flash('Only students can apply to jobs.')
+        return redirect(url_for('presenter_bp.loadJobListings'))
+
+    from models.job import JobListing
+    job = JobListing.query.get_or_404(job_id)
+
+    if job.status != 'approved':
+        flash('This job is not accepting applications.')
+        return redirect(url_for('presenter_bp.loadJobListings'))
+
+    if ApplicationService.hasApplied(current_user.id, job_id):
+        flash('You have already applied to this job.')
+        return redirect(url_for('presenter_bp.my_applications'))
+
+    if request.method == 'POST':
+        files = request.files.getlist('documents')
+        application, error = ApplicationService.submitApplication(
+            current_user.id, job_id, files
+        )
+        if error:
+            flash(error)
+            return render_template('apply.html', job=job)
+
+        send_application_confirmation(
+            current_user.email,
+            application.id,
+            job.role,
+            job.company
+        )
+        flash(f'Application submitted successfully! Your Application ID is: {application.id}')
+        return redirect(url_for('presenter_bp.my_applications'))
+
+    return render_template('apply.html', job=job)
+
+@presenter_bp.route('/my-applications')
+@login_required
+def my_applications():
+    if current_user.role != 'student':
+        flash('Only students can view applications.')
+        return redirect(url_for('presenter_bp.loadDashboard'))
+    applications = ApplicationService.getStudentApplications(current_user.id)
+    return render_template('my_applications.html', applications=applications)
+
+@presenter_bp.route('/profile', methods=['GET', 'POST'])
+@login_required
+def profile():
+    if current_user.role != 'student':
+        flash('Profile editing is for students only.')
+        return redirect(url_for('presenter_bp.loadDashboard'))
+    if request.method == 'POST':
+        gpa = request.form.get('gpa')
+        preferred_hours = request.form.get('preferred_hours')
+        if gpa:
+            try:
+                gpa_val = float(gpa)
+                if 0 <= gpa_val <= 4.3:
+                    current_user.gpa = gpa_val
+                else:
+                    flash('GPA must be between 0 and 4.3.')
+                    return render_template('profile.html')
+            except ValueError:
+                flash('Invalid GPA value.')
+                return render_template('profile.html')
+        current_user.preferred_hours = preferred_hours
+        db.session.commit()
+        flash('Profile updated successfully!')
+        return redirect(url_for('presenter_bp.profile'))
+    return render_template('profile.html')
