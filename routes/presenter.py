@@ -4,6 +4,7 @@ from services.job_manager import JobManager
 from services.interview_scheduler import InterviewScheduler
 from services.application_service import ApplicationService
 from services.email_service import send_application_confirmation
+from services.report_service import ReportService
 from extensions import db
 from datetime import datetime
 
@@ -214,6 +215,46 @@ def my_applications():
         return redirect(url_for('presenter_bp.loadDashboard'))
     applications = ApplicationService.getStudentApplications(current_user.id)
     return render_template('my_applications.html', applications=applications)
+
+@presenter_bp.route('/reports', methods=['GET', 'POST'])
+@login_required
+def activity_report():
+    if current_user.role != 'employee':
+        flash('Only placement staff can generate reports.')
+        return redirect(url_for('presenter_bp.loadDashboard'))
+
+    report = None
+    start_date = None
+    end_date = None
+
+    if request.method == 'POST':
+        start_str = request.form.get('start_date')
+        end_str = request.form.get('end_date')
+
+        try:
+            start_date = None
+            end_date = None
+            for fmt in ('%Y-%m-%d', '%m/%d/%Y', '%d/%m/%Y'):
+                try:
+                    start_date = datetime.strptime(start_str, fmt)
+                    end_date = datetime.strptime(end_str, fmt)
+                    break
+                except (ValueError, TypeError):
+                    continue
+            if not start_date or not end_date:
+                raise ValueError('Unrecognised date format')
+            if start_date > end_date:
+                flash('Start date must be before end date.')
+            else:
+                report = ReportService.generateActivityReport(start_date, end_date)
+        except (ValueError, TypeError):
+            flash('Invalid date format. Please use the date picker.')
+
+    return render_template('reports.html',
+                           report=report,
+                           start_date=start_date,
+                           end_date=end_date)
+
 
 @presenter_bp.route('/profile', methods=['GET', 'POST'])
 @login_required

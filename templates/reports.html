@@ -1,0 +1,222 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div style="margin-top: 4rem;">
+    <h2>Activity <span style="color: var(--primary);">Reports</span></h2>
+    <p style="color: var(--text-muted);">Generate reports tracking jobs, applications, registrations and interview activity.</p>
+
+    <div class="report-params">
+        <h3 style="margin-bottom: 1.5rem;">Report Parameters</h3>
+        <form method="POST" action="/reports">
+            <div class="report-params-grid">
+                <div class="form-group" style="margin-bottom: 0;">
+                    <label for="start_date">Start Date</label>
+                    <input type="date" id="start_date" name="start_date"
+                           value="{{ start_date.strftime('%Y-%m-%d') if start_date else '' }}" required>
+                </div>
+                <div class="form-group" style="margin-bottom: 0;">
+                    <label for="end_date">End Date</label>
+                    <input type="date" id="end_date" name="end_date"
+                           value="{{ end_date.strftime('%Y-%m-%d') if end_date else '' }}" required>
+                </div>
+            </div>
+            <button type="submit" class="btn btn-primary">Generate Report</button>
+        </form>
+    </div>
+
+    {% if report %}
+    <div style="margin-top: 2.5rem;">
+        <p style="color: var(--text-muted); margin-bottom: 1.5rem;">
+            Report period: <strong>{{ report.start_date.strftime('%d %b %Y') }}</strong> to <strong>{{ report.end_date.strftime('%d %b %Y') }}</strong>
+        </p>
+
+        <!-- Jobs Section -->
+        <h3 class="report-section-title">Job Listings</h3>
+        <div class="report-summary-grid" style="grid-template-columns: repeat(4, minmax(0, 1fr));">
+            <div class="report-summary-card">
+                <p class="summary-label">Total Submitted</p>
+                <p class="summary-value primary">{{ report.total_jobs }}</p>
+            </div>
+            <div class="report-summary-card">
+                <p class="summary-label">Approved</p>
+                <p class="summary-value" style="color: var(--success);">{{ report.jobs_approved }}</p>
+            </div>
+            <div class="report-summary-card">
+                <p class="summary-label">Rejected</p>
+                <p class="summary-value" style="color: #ef4444;">{{ report.jobs_rejected }}</p>
+            </div>
+            <div class="report-summary-card">
+                <p class="summary-label">Pending Review</p>
+                <p class="summary-value" style="color: #eab308;">{{ report.jobs_pending }}</p>
+            </div>
+        </div>
+
+        {% if report.top_companies %}
+        <div class="report-breakdown-card" style="margin-bottom: 2rem;">
+            <h3>Top Employers by Submissions</h3>
+            {% set max_count = report.top_companies[0][1] %}
+            {% for company, count in report.top_companies %}
+            <div class="breakdown-row">
+                <div class="breakdown-row-header">
+                    <span>{{ company }}</span>
+                    <span>{{ count }}</span>
+                </div>
+                <div class="breakdown-track">
+                    <div class="breakdown-fill primary" style="width: {{ (count / max_count * 100) | int }}%;"></div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        <!-- Applications Section -->
+        <h3 class="report-section-title">Applications</h3>
+        <div class="report-summary-grid" style="grid-template-columns: repeat(3, minmax(0, 1fr));">
+            <div class="report-summary-card">
+                <p class="summary-label">Total Applications</p>
+                <p class="summary-value primary">{{ report.total_applications }}</p>
+            </div>
+            <div class="report-summary-card">
+                <p class="summary-label">Avg. Applications per Job</p>
+                <p class="summary-value accent">{{ report.app_to_job_ratio }}</p>
+            </div>
+            <div class="report-summary-card">
+                <p class="summary-label">Unique Applicants</p>
+                <p class="summary-value primary">{{ report.applications | map(attribute='student_id') | list | unique | list | length }}</p>
+            </div>
+        </div>
+
+        {% if report.app_status_counts %}
+        <div class="report-breakdown-card" style="margin-bottom: 2rem;">
+            <h3>Applications by Status</h3>
+            {% set max_app = report.app_status_counts.values() | max %}
+            {% for status, count in report.app_status_counts.items() %}
+            <div class="breakdown-row">
+                <div class="breakdown-row-header">
+                    <span>
+                        <span class="status-badge status-{{ status | lower | replace(' ', '-') }}">{{ status }}</span>
+                    </span>
+                    <span>{{ count }}</span>
+                </div>
+                <div class="breakdown-track">
+                    <div class="breakdown-fill accent" style="width: {{ (count / max_app * 100) | int }}%;"></div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        <!-- Registrations Section -->
+        <h3 class="report-section-title">Registrations</h3>
+        <div class="report-summary-grid" style="grid-template-columns: repeat(4, minmax(0, 1fr));">
+            <div class="report-summary-card">
+                <p class="summary-label">Total Users</p>
+                <p class="summary-value primary">{{ report.total_registrations }}</p>
+            </div>
+            <div class="report-summary-card">
+                <p class="summary-label">Students</p>
+                <p class="summary-value accent">{{ report.students }}</p>
+            </div>
+            <div class="report-summary-card">
+                <p class="summary-label">Employers</p>
+                <p class="summary-value" style="color: var(--success);">{{ report.employers }}</p>
+            </div>
+            <div class="report-summary-card">
+                <p class="summary-label">Placement Staff</p>
+                <p class="summary-value" style="color: #eab308;">{{ report.employees }}</p>
+            </div>
+        </div>
+
+        <div class="report-breakdown-grid" style="margin-bottom: 2rem;">
+            <div class="report-breakdown-card">
+                <h3>Employer Activity</h3>
+                <div class="breakdown-row">
+                    <div class="breakdown-row-header">
+                        <span>Active (posted at least one job)</span>
+                        <span>{{ report.active_employers }}</span>
+                    </div>
+                    <div class="breakdown-track">
+                        <div class="breakdown-fill primary" style="width: {{ (report.active_employers / report.employers * 100) | int if report.employers > 0 else 0 }}%;"></div>
+                    </div>
+                </div>
+                <div class="breakdown-row">
+                    <div class="breakdown-row-header">
+                        <span>Inactive (registered, no posts)</span>
+                        <span>{{ report.inactive_employers }}</span>
+                    </div>
+                    <div class="breakdown-track">
+                        <div class="breakdown-fill" style="background: #ef4444; width: {{ (report.inactive_employers / report.employers * 100) | int if report.employers > 0 else 0 }}%;"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="report-breakdown-card">
+                <h3>Student GPA Overview</h3>
+                {% if report.avg_gpa %}
+                <div style="display: flex; align-items: baseline; gap: 0.5rem; margin-bottom: 0.5rem;">
+                    <span style="font-size: 2rem; font-weight: 700; color: var(--primary);">{{ report.avg_gpa }}</span>
+                    <span style="color: var(--text-muted);">/ 4.3 average</span>
+                </div>
+                <p style="color: var(--text-muted); font-size: 0.85rem;">Across all students with a recorded GPA.</p>
+                {% else %}
+                <p style="color: var(--text-muted);">No GPA data recorded yet.</p>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Interviews Section -->
+        <h3 class="report-section-title">Mock Interviews</h3>
+        <div class="report-summary-grid" style="grid-template-columns: repeat(4, minmax(0, 1fr)); margin-bottom: 2rem;">
+            <div class="report-summary-card">
+                <p class="summary-label">Total Slots Created</p>
+                <p class="summary-value primary">{{ report.total_slots }}</p>
+            </div>
+            <div class="report-summary-card">
+                <p class="summary-label">Booked</p>
+                <p class="summary-value" style="color: var(--success);">{{ report.booked_slots }}</p>
+            </div>
+            <div class="report-summary-card">
+                <p class="summary-label">Available</p>
+                <p class="summary-value accent">{{ report.open_slots }}</p>
+            </div>
+            <div class="report-summary-card">
+                <p class="summary-label">Utilisation Rate</p>
+                <p class="summary-value" style="color: {% if report.utilisation >= 75 %}var(--success){% elif report.utilisation >= 40 %}#eab308{% else %}#ef4444{% endif %};">{{ report.utilisation }}%</p>
+            </div>
+        </div>
+
+        <!-- Applications Log -->
+        <div class="report-log-card">
+            <h3>Applications Log</h3>
+            {% if report.applications %}
+            <table class="report-table">
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Student</th>
+                        <th>Job Role</th>
+                        <th>Company</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for app in report.applications %}
+                    <tr>
+                        <td class="muted">{{ app.submitted_at.strftime('%d %b %Y') }}</td>
+                        <td>{{ app.student.username }}</td>
+                        <td>{{ app.job.role }}</td>
+                        <td class="accent">{{ app.job.company }}</td>
+                        <td><span class="status-badge status-{{ app.status | lower | replace(' ', '-') }}">{{ app.status }}</span></td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% else %}
+            <p style="color: var(--text-muted); text-align: center; margin-top: 1rem;">No applications found for this period.</p>
+            {% endif %}
+        </div>
+
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
