@@ -5,6 +5,7 @@ from services.interview_scheduler import InterviewScheduler
 from services.application_service import ApplicationService
 from services.email_service import send_application_confirmation
 from services.report_service import ReportService
+from services.job_search_engine import JobSearchEngine
 from extensions import db
 from datetime import datetime
 
@@ -82,12 +83,35 @@ def searchJobs():
     if current_user.role != 'student':
         flash('Only students can search jobs here.')
         return redirect(url_for('presenter_bp.loadDashboard'))
-    keyword = request.args.get('keyword', '')
-    if keyword:
-        jobs = JobManager.searchJobs(keyword)
-    else:
-        jobs = JobManager.getApprovedJobs()
-    return render_template('search_jobs.html', jobs=jobs, keyword=keyword)
+
+    # Get parameters
+    keyword = request.args.get('keyword', '').strip()
+    company = request.args.get('company', 'all')
+    sort_by = request.args.get('sort', 'newest')
+    page = request.args.get('page', 1, type=int)
+
+    # Perform search using the engine
+    paginated_jobs = JobSearchEngine.search(
+        keyword=keyword if keyword else None,
+        company=company,
+        sort_by=sort_by,
+        page=page
+    )
+
+    # Get distinct companies for the filter
+    companies = JobSearchEngine.get_available_companies()
+
+    return render_template(
+        'search_jobs.html',
+        jobs=paginated_jobs.items,
+        pagination=paginated_jobs,
+        keyword=keyword,
+        selected_company=company,
+        selected_sort=sort_by,
+        companies=companies,
+        # Helper for pagination URLs
+        build_pagination_url=lambda p: JobSearchEngine.build_pagination_urls(request.args, p)
+    )
 
 @presenter_bp.route('/save-job/<int:job_id>', methods=['POST'])
 @login_required

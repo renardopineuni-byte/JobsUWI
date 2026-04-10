@@ -10,17 +10,52 @@
         <a href="/dashboard" class="btn btn-outline">Back to Dashboard</a>
     </div>
 
-    <!-- Search Form -->
+    <!-- Advanced Search Form -->
     <div style="background: var(--bg-card); border-radius: 12px; padding: 2rem; margin-bottom: 3rem; border: 1px solid var(--border-color);">
-        <form method="GET" action="/search-jobs" style="display: flex; gap: 1rem;">
-            <input type="text" name="keyword" value="{{ keyword }}" placeholder="Search by title, company, or description..." class="form-control" style="flex: 1;" required>
-            <button type="submit" class="btn">Search</button>
-            {% if keyword %}
-                <a href="/search-jobs" class="btn btn-outline">Clear</a>
-            {% endif %}
+        <form method="GET" action="{{ url_for('presenter_bp.searchJobs') }}" style="display: flex; flex-wrap: wrap; gap: 1rem; align-items: flex-end;">
+            
+            <div class="form-group" style="flex: 2; min-width: 180px; margin-bottom: 0;">
+                <label style="display: block; margin-bottom: 0.4rem; color: var(--text-muted); font-size: 0.85rem;">Keyword</label>
+                <input type="text" name="keyword" value="{{ keyword }}" placeholder="Title, company, or description...">
+            </div>
+
+            <div class="form-group" style="flex: 1; min-width: 150px; margin-bottom: 0;">
+                <label style="display: block; margin-bottom: 0.4rem; color: var(--text-muted); font-size: 0.85rem;">Company</label>
+                <select name="company">
+                    <option value="all" {% if selected_company == 'all' %}selected{% endif %}>All companies</option>
+                    {% for comp in companies %}
+                    <option value="{{ comp }}" {% if selected_company == comp %}selected{% endif %}>{{ comp }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="form-group" style="flex: 1; min-width: 150px; margin-bottom: 0;">
+                <label style="display: block; margin-bottom: 0.4rem; color: var(--text-muted); font-size: 0.85rem;">Sort by</label>
+                <select name="sort">
+                    <option value="newest" {% if selected_sort == 'newest' %}selected{% endif %}>Newest first</option>
+                    <option value="oldest" {% if selected_sort == 'oldest' %}selected{% endif %}>Oldest first</option>
+                    <option value="company_asc" {% if selected_sort == 'company_asc' %}selected{% endif %}>Company (A-Z)</option>
+                    <option value="company_desc" {% if selected_sort == 'company_desc' %}selected{% endif %}>Company (Z-A)</option>
+                </select>
+            </div>
+
+            <div style="display: flex; gap: 0.5rem;">
+                <button type="submit" class="btn btn-primary">Search</button>
+                {% if keyword or selected_company != 'all' or selected_sort != 'newest' %}
+                    <a href="{{ url_for('presenter_bp.searchJobs') }}" class="btn btn-outline">Clear</a>
+                {% endif %}
+            </div>
         </form>
     </div>
 
+    <!-- Results count -->
+    {% if pagination and pagination.total is defined %}
+        <p style="color: var(--text-muted); margin-bottom: 1rem;">
+            Found {{ pagination.total }} job{{ 's' if pagination.total != 1 else '' }}
+        </p>
+    {% endif %}
+
+    <!-- Job Grid with both Save and View Details -->
     <div class="job-grid">
         {% for job in jobs %}
         <div class="job-card">
@@ -28,9 +63,12 @@
             <span class="company">{{ job.company }}</span>
             <p>{{ job.description[:120] }}...</p>
             <div style="margin-top: 1rem; display: flex; gap: 0.5rem; justify-content: space-between;">
-                <form action="/save-job/{{ job.id }}" method="POST" style="margin:0;">
-                    <button type="submit" class="btn btn-outline" style="font-size: 0.8rem;">Save Job</button>
+                {% if current_user.is_authenticated and current_user.role == 'student' %}
+                <form action="{{ url_for('presenter_bp.saveJob', job_id=job.id) }}" method="POST" style="margin:0;">
+                    <button type="submit" class="btn btn-outline" style="font-size: 0.8rem;">💾 Save Job</button>
                 </form>
+                {% endif %}
+                <a href="{{ url_for('presenter_bp.job_detail', job_id=job.id) }}" class="btn btn-outline" style="font-size: 0.8rem;">View Details</a>
             </div>
         </div>
         {% else %}
@@ -39,5 +77,20 @@
         </div>
         {% endfor %}
     </div>
+
+    <!-- pages -->
+    {% if pagination and pagination.pages > 1 %}
+    <div style="display: flex; justify-content: center; gap: 0.5rem; margin: 3rem 0;">
+        {% if pagination.has_prev %}
+        <a href="{{ build_pagination_url(pagination.prev_num) }}" class="btn btn-outline">← Previous</a>
+        {% endif %}
+        <span style="padding: 0.6rem 1rem; background: var(--bg-card); border-radius: 8px;">
+            Page {{ pagination.page }} of {{ pagination.pages }}
+        </span>
+        {% if pagination.has_next %}
+        <a href="{{ build_pagination_url(pagination.next_num) }}" class="btn btn-outline">Next →</a>
+        {% endif %}
+    </div>
+    {% endif %}
 </div>
 {% endblock %}
