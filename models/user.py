@@ -1,10 +1,13 @@
 from flask_login import UserMixin
 from extensions import db
+from datetime import datetime
 
-saved_jobs_table = db.Table('saved_jobs',
-    db.Column('student_id', db.Integer, db.ForeignKey('user.id'), primary_key=True),
-    db.Column('job_id', db.Integer, db.ForeignKey('job_listing.id'), primary_key=True)
-)
+class SavedJob(db.Model):
+    __tablename__ = 'saved_jobs'
+    student_id = db.Column(db.Integer, db.ForeignKey('user.id'), primary_key=True)
+    job_id = db.Column(db.Integer, db.ForeignKey('job_listing.id'), primary_key=True)
+    saved_at = db.Column(db.DateTime, default=datetime.utcnow)
+    job = db.relationship('JobListing', foreign_keys=[job_id])
 
 class User(UserMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -35,6 +38,4 @@ class Student(User):
 
     gpa = db.Column(db.Float, nullable=True)
     preferred_hours = db.Column(db.String(100), nullable=True)
-    
-    saved_jobs = db.relationship('JobListing', secondary=saved_jobs_table,
-                                 backref=db.backref('saved_by_students', lazy='dynamic'))
+    saved_jobs = db.relationship('SavedJob', backref='student', lazy=True)

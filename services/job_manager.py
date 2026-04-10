@@ -53,10 +53,24 @@ class JobManager:
 
     @staticmethod
     def saveJob(student_id, job_id):
+        from models.user import SavedJob
         student = Student.query.get(student_id)
         job = JobListing.query.get(job_id)
-        if student and job and job not in student.saved_jobs:
-            student.saved_jobs.append(job)
+        if student and job and job.status == 'approved':
+            existing = SavedJob.query.filter_by(student_id=student_id, job_id=job_id).first()
+            if not existing:
+                new_save = SavedJob(student_id=student_id, job_id=job_id)
+                db.session.add(new_save)
+                db.session.commit()
+                return True
+        return False
+
+    @staticmethod
+    def unsaveJob(student_id, job_id):
+        from models.user import SavedJob
+        existing = SavedJob.query.filter_by(student_id=student_id, job_id=job_id).first()
+        if existing:
+            db.session.delete(existing)
             db.session.commit()
             return True
         return False

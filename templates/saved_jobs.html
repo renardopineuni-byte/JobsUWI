@@ -16,12 +16,22 @@
             <h3>{{ job.role }}</h3>
             <span class="company">{{ job.company }}</span>
             <p>{{ job.description[:120] }}...</p>
-            <span class="status-badge status-approved" style="margin-top: 1rem; margin-bottom: 1rem;">Saved</span>
+            <div
+                style="display: flex; justify-content: space-between; align-items: center; margin-top: 1rem; margin-bottom: 1rem;">
+                <form action="{{ url_for('presenter_bp.unsaveJob', job_id=job.id) }}" method="POST" style="margin: 0;">
+                    <button type="submit" class="btn btn-primary"
+                        style="font-size: 0.8rem; padding: 0.4rem 1rem;">Unsave</button>
+                </form>
+                <a href="{{ url_for('presenter_bp.job_detail', job_id=job.id) }}" class="btn btn-outline"
+                    style="font-size: 0.8rem; padding: 0.4rem 1rem;">View Details</a>
+            </div>
         </div>
         {% else %}
-        <div style="background: rgba(255,255,255,0.03); border: 1px dashed rgba(255,255,255,0.1); border-radius: 12px; padding: 2.5rem; text-align: center; grid-column: 1/-1;">
+        <div
+            style="background: rgba(255,255,255,0.03); border: 1px dashed rgba(255,255,255,0.1); border-radius: 12px; padding: 2.5rem; text-align: center; grid-column: 1/-1;">
             <p style="color: var(--text-muted);">You haven't saved any jobs yet.</p>
-            <a href="/search-jobs" class="btn btn-outline" style="margin-top: 1rem; display: inline-block;">Search for Jobs</a>
+            <a href="/search-jobs" class="btn btn-outline" style="margin-top: 1rem; display: inline-block;">Search for
+                Jobs</a>
         </div>
         {% endfor %}
     </div>

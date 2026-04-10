@@ -5,7 +5,7 @@ from services.interview_scheduler import InterviewScheduler
 from services.application_service import ApplicationService
 from services.email_service import send_application_confirmation
 from services.report_service import ReportService
-from services.job_search_engine import JobSearchEngine
+#from services.job_search_engine import JobSearchEngine
 from extensions import db
 from datetime import datetime
 
@@ -21,9 +21,12 @@ def job_detail(job_id):
     from models.job import JobListing
     job = JobListing.query.get_or_404(job_id)
     already_applied = False
+    already_saved = False
     if current_user.is_authenticated and current_user.role == 'student':
         already_applied = ApplicationService.hasApplied(current_user.id, job_id)
-    return render_template('job_detail.html', job=job, already_applied=already_applied)
+        from models.user import SavedJob
+        already_saved = SavedJob.query.filter_by(student_id=current_user.id, job_id=job_id).first() is not None
+    return render_template('job_detail.html', job=job, already_applied=already_applied, already_saved=already_saved)
 
 @presenter_bp.route('/dashboard')
 @login_required
@@ -74,7 +77,7 @@ def loadSavedJobs():
     if current_user.role != 'student':
         flash('Only students can view saved jobs.')
         return redirect(url_for('presenter_bp.loadDashboard'))
-    saved_jobs = current_user.saved_jobs
+    saved_jobs = [sj.job for sj in current_user.saved_jobs if sj.job]
     return render_template('saved_jobs.html', jobs=saved_jobs)
 
 @presenter_bp.route('/search-jobs', methods=['GET'])
@@ -125,6 +128,17 @@ def saveJob(job_id):
     else:
         flash('Job already saved or does not exist.')
     return redirect(request.referrer or url_for('presenter_bp.loadJobListings'))
+
+@presenter_bp.route('/unsave-job/<int:job_id>', methods=['POST'])
+@login_required
+def unsaveJob(job_id):
+    if current_user.role != 'student':
+        flash('Unauthorized.')
+        return redirect(url_for('presenter_bp.loadJobListings'))
+    success = JobManager.unsaveJob(current_user.id, job_id)
+    if success:
+        flash('Job removed from saved jobs.')
+    return redirect(request.referrer or url_for('presenter_bp.loadSavedJobs'))
 
 # Job Actions
 @presenter_bp.route('/approve/<int:job_id>')
