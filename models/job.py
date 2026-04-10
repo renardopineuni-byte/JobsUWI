@@ -9,6 +9,7 @@ class JobListing(db.Model):
     status = db.Column(db.String(50), default='pending')
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     
+    
     employer_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     employer = db.relationship('User', foreign_keys=[employer_id], backref=db.backref('jobs', lazy=True))
 

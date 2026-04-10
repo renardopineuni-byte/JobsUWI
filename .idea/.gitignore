@@ -5,3 +5,6 @@
 /modules.xml
 /misc.xml
 /NewGravTest.iml
+__pycache__/
+*.pyc
+instance/*.db
