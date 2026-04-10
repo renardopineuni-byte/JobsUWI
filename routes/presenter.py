@@ -5,7 +5,7 @@ from services.interview_scheduler import InterviewScheduler
 from services.application_service import ApplicationService
 from services.email_service import send_application_confirmation
 from services.report_service import ReportService
-#from services.job_search_engine import JobSearchEngine
+from services.job_search_engine import JobSearchEngine
 from extensions import db
 from datetime import datetime
 
